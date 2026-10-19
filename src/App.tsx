@@ -13,6 +13,9 @@ import Menu from "./pages/Menu";
 import Search from "./pages/Search";
 import AppShell from "./components/AppShell";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./context/AuthContext";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -21,9 +24,17 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<AppShell />}>
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/" element={<Index />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/messages" element={<Messages />} />
@@ -37,6 +48,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
