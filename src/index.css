@@ -5,6 +5,14 @@
 @layer base {
   :root{
      --radius: 0.5rem;
+     --mk-cream: 42 60% 97%;
+     --mk-paper: 40 30% 96%;
+     --mk-gold: 36 62% 50%;
+     --mk-gold-deep: 33 77% 35%;
+     --mk-ink: 160 30% 12%;
+     --mk-sage: 150 6% 45%;
+     --mk-live: 0 72% 51%;
+     --mk-rose: 6 40% 55%;
      --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 

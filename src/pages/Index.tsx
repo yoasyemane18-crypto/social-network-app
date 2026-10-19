@@ -1,4 +1,25 @@
 import { useState } from "react";
+import {
+  Bell,
+  Camera,
+  Clapperboard,
+  Image as ImageIcon,
+  Menu,
+  MessageCircle,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Sparkles,
+  Store,
+  ThumbsUp,
+  Users,
+  Video,
+  Globe,
+  Home,
+  MessageSquare,
+  Share2,
+} from "lucide-react";
+import myPhoto from "../assets/screenshot_20261018_185306_meskot.jpg";
 
 type Comment = { id: number; author: string; text: string };
 type Post = {
@@ -8,83 +29,102 @@ type Post = {
   color: string;
   time: string;
   text: string;
+  sponsored?: boolean;
   likes: number;
   liked: boolean;
   comments: Comment[];
 };
 
-const ME = { name: "You", initials: "ME", color: "bg-blue-600" };
+const ME = { name: "You", initials: "ME", photo: myPhoto };
+
+const navItems = [
+  { label: "Feed", icon: Home },
+  { label: "Friends", icon: Users },
+  { label: "Messages", icon: MessageCircle },
+  { label: "Reels", icon: Clapperboard },
+  { label: "Market", icon: Store },
+  { label: "Alerts", icon: Bell },
+  { label: "Menu", icon: Menu },
+];
 
 const initialPosts: Post[] = [
   {
     id: 1,
-    author: "Ava Johnson",
-    initials: "AJ",
-    color: "bg-rose-500",
-    time: "2h",
-    text: "Just finished my first marathon! Legs are jelly but my heart is full.",
+    author: "Hesam Yemane",
+    initials: "HY",
+    color: "bg-meskot-gold",
+    time: "Sep 17 at 12:35 PM",
+    text: "Sharing a moment with the people who matter most. Gratitude every day.",
+    sponsored: true,
     likes: 128,
     liked: false,
-    comments: [{ id: 1, author: "Ben Lee", text: "Congrats, that is huge!" }],
+    comments: [{ id: 1, author: "Ben Lee", text: "Beautiful, congrats!" }],
   },
   {
     id: 2,
-    author: "Marcus Chen",
-    initials: "MC",
-    color: "bg-emerald-500",
-    time: "5h",
-    text: "Weekend hike was unreal. The view from the top made every step worth it.",
+    author: "Ava Johnson",
+    initials: "AJ",
+    color: "bg-meskot-rose",
+    time: "2h",
+    text: "Just finished my first marathon! Legs are jelly but my heart is full.",
     likes: 64,
     liked: false,
     comments: [],
   },
   {
     id: 3,
-    author: "Priya Patel",
-    initials: "PP",
-    color: "bg-amber-500",
-    time: "1d",
-    text: "Tried baking sourdough for the first time today. It is flat, but it tastes great!",
+    author: "Marcus Chen",
+    initials: "MC",
+    color: "bg-meskot-sage",
+    time: "5h",
+    text: "Weekend hike was unreal. The view from the top made every step worth it.",
     likes: 210,
     liked: false,
     comments: [
-      { id: 1, author: "Ava Johnson", text: "Flat bread still counts as a win." },
-      { id: 2, author: "Marcus Chen", text: "Send the recipe please!" },
+      { id: 1, author: "Ava Johnson", text: "Looks amazing!" },
+      { id: 2, author: "Priya Patel", text: "Where was this?" },
     ],
   },
 ];
 
-const stories = [
-  { name: "Ava", initials: "AJ", color: "bg-rose-500" },
-  { name: "Marcus", initials: "MC", color: "bg-emerald-500" },
-  { name: "Priya", initials: "PP", color: "bg-amber-500" },
-  { name: "Ben", initials: "BL", color: "bg-violet-500" },
-  { name: "Sofia", initials: "SR", color: "bg-sky-500" },
-];
-
 const friends = [
-  { name: "Ben Lee", initials: "BL", color: "bg-violet-500", online: true },
-  { name: "Sofia Rossi", initials: "SR", color: "bg-sky-500", online: true },
-  { name: "Liam Brown", initials: "LB", color: "bg-teal-500", online: false },
-  { name: "Noah Kim", initials: "NK", color: "bg-orange-500", online: true },
+  { name: "Ben Lee", initials: "BL", color: "bg-meskot-rose", online: true },
+  { name: "Sofia Rossi", initials: "SR", color: "bg-meskot-sage", online: true },
+  { name: "Liam Brown", initials: "LB", color: "bg-meskot-gold-deep", online: false },
 ];
 
-const menu = ["Friends", "Groups", "Marketplace", "Watch", "Memories", "Saved"];
-
-function Avatar({ initials, color, size = "h-10 w-10" }: { initials: string; color: string; size?: string }) {
+function Avatar({
+  initials,
+  color,
+  photo,
+  size = "h-11 w-11",
+  ring = false,
+}: {
+  initials: string;
+  color?: string;
+  photo?: string;
+  size?: string;
+  ring?: boolean;
+}) {
   return (
-    <div className={`${size} ${color} flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white`}>
-      {initials}
+    <div
+      className={`${size} ${color ?? ""} flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-meskot-cream font-serif text-sm font-bold text-meskot-cream ${
+        ring ? "shadow-[0_0_0_2px_hsl(var(--mk-gold))]" : "shadow-sm"
+      }`}
+    >
+      {photo ? <img src={photo} alt={initials} className="h-full w-full object-cover" /> : initials}
     </div>
   );
 }
 
 export default function Index() {
+  const [active, setActive] = useState("Feed");
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [draft, setDraft] = useState("");
   const [commentDrafts, setCommentDrafts] = useState<Record<number, string>>({});
   const [openComments, setOpenComments] = useState<Record<number, boolean>>({});
   const [nextId, setNextId] = useState(100);
+  const [composerMode, setComposerMode] = useState<string | null>(null);
 
   const toggleLike = (id: number) =>
     setPosts((prev) =>
@@ -100,7 +140,7 @@ export default function Index() {
       id: nextId,
       author: ME.name,
       initials: ME.initials,
-      color: ME.color,
+      color: "",
       time: "Just now",
       text,
       likes: 0,
@@ -110,6 +150,7 @@ export default function Index() {
     setPosts((prev) => [post, ...prev]);
     setNextId((n) => n + 1);
     setDraft("");
+    setComposerMode(null);
   };
 
   const addComment = (postId: number) => {
@@ -127,135 +168,223 @@ export default function Index() {
 
   const deletePost = (id: number) => setPosts((prev) => prev.filter((p) => p.id !== id));
 
+  const composerButtons = [
+    { label: "Live", icon: null, tone: "bg-meskot-live text-meskot-cream border-transparent" },
+    { label: "Story", icon: Camera, tone: "bg-meskot-cream text-meskot-gold-deep border-meskot-gold/40" },
+    { label: "Reel", icon: Video, tone: "bg-meskot-gold-deep text-meskot-cream border-transparent" },
+    { label: "Photo", icon: ImageIcon, tone: "bg-meskot-cream text-meskot-ink border-meskot-ink/20" },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      {/* Top bar */}
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
-            f
-          </div>
-          <input
-            placeholder="Search Buildify"
-            className="hidden w-64 rounded-full bg-slate-100 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 md:block"
-          />
-        </div>
-        <nav className="hidden gap-6 text-sm font-medium text-slate-500 sm:flex">
-          <span className="border-b-2 border-blue-600 pb-3 pt-3 text-blue-600">Home</span>
-          <span className="pt-3 hover:text-slate-800">Reels</span>
-          <span className="pt-3 hover:text-slate-800">Market</span>
-        </nav>
-        <Avatar initials={ME.initials} color={ME.color} size="h-9 w-9" />
-      </header>
-
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-3 py-6 md:grid-cols-[220px_1fr] lg:grid-cols-[220px_1fr_260px]">
-        {/* Left sidebar */}
-        <aside className="hidden space-y-1 md:block">
-          <div className="mb-3 flex items-center gap-3 rounded-lg p-2 hover:bg-slate-200">
-            <Avatar initials={ME.initials} color={ME.color} size="h-8 w-8" />
-            <span className="text-sm font-semibold">{ME.name}</span>
-          </div>
-          {menu.map((item) => (
-            <div key={item} className="cursor-pointer rounded-lg px-2 py-2 text-sm font-medium hover:bg-slate-200">
-              {item}
+    <div className="min-h-screen bg-meskot-paper font-sans text-meskot-ink">
+      <div className="mx-auto max-w-md pb-10">
+        {/* Header */}
+        <header className="flex items-center justify-between bg-meskot-cream px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-meskot-gold bg-meskot-cream font-serif text-xl font-bold italic text-meskot-gold-deep shadow-sm">
+              M
             </div>
-          ))}
-        </aside>
-
-        {/* Feed */}
-        <main className="space-y-4">
-          {/* Stories */}
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {stories.map((s) => (
-              <div
-                key={s.name}
-                className="flex h-44 w-28 shrink-0 cursor-pointer flex-col justify-between overflow-hidden rounded-xl bg-white shadow-sm"
-              >
-                <div className={`${s.color} flex flex-1 items-center justify-center text-2xl font-bold text-white`}>
-                  {s.initials}
-                </div>
-                <div className="p-2 text-center text-xs font-semibold">{s.name}</div>
-              </div>
-            ))}
+            <span className="font-serif text-2xl font-bold tracking-tight">Meskot</span>
           </div>
+          <button
+            aria-label="Search"
+            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-meskot-gold/50 bg-meskot-cream text-meskot-gold-deep transition hover:bg-meskot-gold/10"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+        </header>
+
+        {/* Bottom-style nav as top tabs */}
+        <nav className="grid grid-cols-7 gap-1 border-y border-meskot-gold/20 bg-meskot-cream px-2 py-2">
+          {navItems.map(({ label, icon: Icon }) => {
+            const isActive = active === label;
+            return (
+              <button
+                key={label}
+                onClick={() => setActive(label)}
+                className={`flex flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-semibold transition ${
+                  isActive
+                    ? "border-2 border-meskot-gold/60 bg-meskot-gold/10 text-meskot-ink"
+                    : "border-2 border-transparent text-meskot-sage hover:text-meskot-ink"
+                }`}
+              >
+                <Icon className={`h-6 w-6 ${isActive ? "text-meskot-gold-deep" : ""}`} />
+                <span className="truncate">{label}</span>
+                {isActive && <span className="mt-0.5 h-1 w-8 rounded-full bg-meskot-gold" />}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="space-y-4 p-3">
+          {/* Stories card */}
+          <section className="rounded-[28px] border-2 border-meskot-gold/50 bg-meskot-cream p-4 shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-meskot-gold to-meskot-gold-deep text-meskot-cream">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h2 className="font-serif text-lg font-bold">Meskot Stories</h2>
+              <span className="rounded-full border-2 border-meskot-live/30 bg-meskot-live/10 px-3 py-0.5 text-xs font-bold tracking-wider text-meskot-live">
+                1 LIVE
+              </span>
+              <button className="ml-auto text-sm font-bold text-meskot-gold-deep">+ Add Moment</button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {/* Create story */}
+              <button className="flex h-72 flex-col overflow-hidden rounded-[24px] border-2 border-meskot-rose/60 bg-meskot-paper text-left">
+                <div className="relative h-[62%] overflow-hidden">
+                  <img src={myPhoto} alt="Create story" className="h-full w-full object-cover object-top" />
+                </div>
+                <div className="relative flex flex-1 flex-col items-center justify-end pb-4">
+                  <span className="absolute -top-6 flex h-12 w-12 items-center justify-center rounded-full border-4 border-meskot-cream bg-gradient-to-br from-meskot-gold to-meskot-gold-deep text-meskot-cream shadow-md">
+                    <Plus className="h-6 w-6" />
+                  </span>
+                  <span className="text-base font-bold">Create Story</span>
+                  <span className="text-sm font-semibold text-meskot-gold-deep">Share moment</span>
+                </div>
+              </button>
+
+              {/* Your story */}
+              <div className="relative h-72 overflow-hidden rounded-[24px] border-2 border-meskot-gold bg-meskot-ink shadow-md">
+                <img src={myPhoto} alt="Your story" className="h-full w-full object-cover object-top" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-10">
+                  <span className="text-sm font-bold text-meskot-cream">Your Story</span>
+                </div>
+                <div className="absolute left-3 top-3">
+                  <Avatar photo={myPhoto} initials="ME" size="h-11 w-11" ring />
+                </div>
+              </div>
+            </div>
+          </section>
 
           {/* Composer */}
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <div className="flex gap-3">
-              <Avatar initials={ME.initials} color={ME.color} />
-              <textarea
+          <section className="rounded-[28px] border-2 border-meskot-gold/30 bg-meskot-cream p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <Avatar photo={ME.photo} initials={ME.initials} size="h-14 w-14" />
+              <input
                 value={draft}
+                onFocus={() => setComposerMode("post")}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="What is on your mind?"
-                rows={2}
-                className="flex-1 resize-none rounded-lg bg-slate-100 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyDown={(e) => e.key === "Enter" && publish()}
+                placeholder="What's on your mind?"
+                className="h-12 flex-1 rounded-full border-2 border-meskot-gold/30 bg-meskot-paper px-5 text-base font-medium text-meskot-ink placeholder:text-meskot-gold-deep/80 outline-none focus:border-meskot-gold"
               />
             </div>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs text-slate-500">{draft.trim().length} characters</span>
-              <button
-                onClick={publish}
-                disabled={!draft.trim()}
-                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Post
-              </button>
+            <div className="my-4 h-px bg-meskot-gold/20" />
+            <div className="grid grid-cols-4 gap-2">
+              {composerButtons.map(({ label, icon: Icon, tone }) => (
+                <button
+                  key={label}
+                  onClick={() => (label === "Photo" || label === "Story" || label === "Reel" || label === "Live") && setComposerMode(label.toLowerCase())}
+                  className={`flex h-12 items-center justify-center gap-1.5 rounded-2xl border-2 px-2 text-sm font-bold transition hover:brightness-95 ${tone}`}
+                >
+                  {Icon ? <Icon className="h-4 w-4 shrink-0" /> : <span className="h-2.5 w-2.5 rounded-full bg-meskot-cream" />}
+                  <span className="truncate">{label}</span>
+                </button>
+              ))}
             </div>
-          </div>
+            {draft.trim() && (
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs font-medium text-meskot-sage">{composerMode ?? "post"}</span>
+                <button
+                  onClick={publish}
+                  className="rounded-full bg-meskot-gold-deep px-6 py-2 text-sm font-bold text-meskot-cream transition hover:brightness-110"
+                >
+                  Post
+                </button>
+              </div>
+            )}
+          </section>
 
           {/* Posts */}
-          {posts.length === 0 && (
-            <p className="rounded-xl bg-white p-6 text-center text-sm text-slate-500 shadow-sm">
-              No posts yet. Share something above!
-            </p>
-          )}
           {posts.map((post) => (
-            <article key={post.id} className="rounded-xl bg-white shadow-sm">
-              <div className="flex items-start justify-between p-4">
-                <div className="flex gap-3">
-                  <Avatar initials={post.initials} color={post.color} />
-                  <div>
-                    <div className="text-sm font-semibold">{post.author}</div>
-                    <div className="text-xs text-slate-500">{post.time}</div>
+            <article
+              key={post.id}
+              className="overflow-hidden rounded-[28px] border-2 border-meskot-gold/30 bg-meskot-cream shadow-sm"
+            >
+              <div className="h-1.5 bg-gradient-to-r from-meskot-gold/40 via-meskot-gold to-meskot-gold/40" />
+              <div className="flex items-start gap-3 p-4">
+                <Avatar
+                  initials={post.initials}
+                  color={post.color || undefined}
+                  photo={post.author === ME.name ? ME.photo : undefined}
+                  size="h-14 w-14"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-serif text-base font-bold">{post.author}</span>
+                    {post.sponsored && (
+                      <span className="rounded-xl bg-meskot-gold-deep px-2.5 py-1 text-[11px] font-bold text-meskot-cream">
+                        Sponsored · Boosted
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1 text-xs font-medium text-meskot-sage">
+                    {post.time}
+                    <span>·</span>
+                    <Globe className="h-3.5 w-3.5" />
                   </div>
                 </div>
-                {post.author === ME.name && (
+                {post.author === ME.name ? (
                   <button
                     onClick={() => deletePost(post.id)}
-                    className="text-xs font-medium text-slate-500 hover:text-red-600"
+                    className="text-xs font-bold text-meskot-sage hover:text-meskot-live"
                   >
                     Delete
                   </button>
+                ) : (
+                  <MoreHorizontal className="h-6 w-6 text-meskot-sage" />
                 )}
               </div>
-              <p className="px-4 pb-4 text-sm leading-relaxed">{post.text}</p>
 
-              <div className="flex justify-between border-t border-slate-200 px-4 py-2 text-xs text-slate-500">
-                <span>{post.likes} likes</span>
+              <p className="px-4 pb-4 text-[15px] leading-relaxed">{post.text}</p>
+
+              {post.id === 1 && (
+                <div className="mx-4 mb-4 h-48 overflow-hidden rounded-2xl bg-gradient-to-br from-meskot-ink via-meskot-sage to-meskot-gold-deep" />
+              )}
+
+              <div className="flex items-center justify-between px-4 pb-2 text-xs font-medium text-meskot-sage">
+                <span className="flex items-center gap-1">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-meskot-gold text-[10px] text-meskot-cream">
+                    <ThumbsUp className="h-3 w-3" />
+                  </span>
+                  {post.likes}
+                </span>
                 <span>{post.comments.length} comments</span>
               </div>
-              <div className="grid grid-cols-2 border-t border-slate-200 text-sm font-semibold text-slate-600">
+
+              <div className="grid grid-cols-3 border-t border-meskot-gold/20 text-sm font-bold text-meskot-sage">
                 <button
                   onClick={() => toggleLike(post.id)}
-                  className={`py-2 transition hover:bg-slate-100 ${post.liked ? "text-blue-600" : ""}`}
+                  className={`flex items-center justify-center gap-1.5 py-3 transition hover:bg-meskot-gold/10 ${
+                    post.liked ? "text-meskot-gold-deep" : ""
+                  }`}
                 >
-                  {post.liked ? "Liked" : "Like"}
+                  <ThumbsUp className="h-4 w-4" /> {post.liked ? "Liked" : "Like"}
                 </button>
                 <button
                   onClick={() => setOpenComments((o) => ({ ...o, [post.id]: !o[post.id] }))}
-                  className="py-2 transition hover:bg-slate-100"
+                  className="flex items-center justify-center gap-1.5 py-3 transition hover:bg-meskot-gold/10"
                 >
-                  Comment
+                  <MessageSquare className="h-4 w-4" /> Comment
+                </button>
+                <button className="flex items-center justify-center gap-1.5 py-3 transition hover:bg-meskot-gold/10">
+                  <Share2 className="h-4 w-4" /> Share
                 </button>
               </div>
 
               {openComments[post.id] && (
-                <div className="space-y-3 border-t border-slate-200 p-4">
+                <div className="space-y-3 border-t border-meskot-gold/20 bg-meskot-paper/60 p-4">
                   {post.comments.map((c) => (
                     <div key={c.id} className="flex gap-2">
-                      <Avatar initials={c.author.split(" ").map((w) => w[0]).join("").slice(0, 2)} color="bg-slate-400" size="h-8 w-8" />
-                      <div className="rounded-xl bg-slate-100 px-3 py-2">
-                        <div className="text-xs font-semibold">{c.author}</div>
+                      <Avatar
+                        initials={c.author.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                        color="bg-meskot-sage"
+                        size="h-8 w-8"
+                      />
+                      <div className="rounded-2xl bg-meskot-cream px-3 py-2">
+                        <div className="text-xs font-bold">{c.author}</div>
                         <div className="text-sm">{c.text}</div>
                       </div>
                     </div>
@@ -266,11 +395,11 @@ export default function Index() {
                       onChange={(e) => setCommentDrafts((d) => ({ ...d, [post.id]: e.target.value }))}
                       onKeyDown={(e) => e.key === "Enter" && addComment(post.id)}
                       placeholder="Write a comment..."
-                      className="flex-1 rounded-full bg-slate-100 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 rounded-full border-2 border-meskot-gold/30 bg-meskot-cream px-4 py-2 text-sm outline-none focus:border-meskot-gold"
                     />
                     <button
                       onClick={() => addComment(post.id)}
-                      className="rounded-full bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
+                      className="rounded-full bg-meskot-gold-deep px-4 text-sm font-bold text-meskot-cream"
                     >
                       Send
                     </button>
@@ -279,32 +408,26 @@ export default function Index() {
               )}
             </article>
           ))}
-        </main>
 
-        {/* Right sidebar */}
-        <aside className="hidden space-y-3 lg:block">
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold text-slate-500">Contacts</h2>
+          {/* Contacts */}
+          <section className="rounded-[28px] border-2 border-meskot-gold/30 bg-meskot-cream p-4 shadow-sm">
+            <h2 className="mb-3 font-serif text-base font-bold">Contacts</h2>
             <ul className="space-y-3">
               {friends.map((f) => (
                 <li key={f.name} className="flex items-center gap-3">
                   <div className="relative">
-                    <Avatar initials={f.initials} color={f.color} size="h-8 w-8" />
+                    <Avatar initials={f.initials} color={f.color} size="h-10 w-10" />
                     {f.online && (
-                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
+                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-meskot-cream bg-meskot-sage" />
                     )}
                   </div>
-                  <span className="text-sm font-medium">{f.name}</span>
+                  <span className="text-sm font-semibold">{f.name}</span>
                 </li>
               ))}
             </ul>
-          </div>
-        </aside>
+          </section>
+        </div>
       </div>
-
-      <footer className="pb-6 text-center text-xs text-slate-500">
-        Sample data only. Posts, likes and comments work during this session.
-      </footer>
     </div>
   );
 }

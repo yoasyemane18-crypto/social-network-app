@@ -2,12 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
 	darkMode: ["class"],
-	content: [
+	content: ["./src/**/*.{ts,tsx,js,jsx}", ...([
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
-	],
+	])],
 	prefix: "",
 	theme: {
 		container: {
@@ -20,6 +20,16 @@ export default {
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
+				meskot: {
+					cream: 'hsl(var(--mk-cream))',
+					paper: 'hsl(var(--mk-paper))',
+					gold: 'hsl(var(--mk-gold))',
+					'gold-deep': 'hsl(var(--mk-gold-deep))',
+					ink: 'hsl(var(--mk-ink))',
+					sage: 'hsl(var(--mk-sage))',
+					live: 'hsl(var(--mk-live))',
+					rose: 'hsl(var(--mk-rose))',
+				},
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
